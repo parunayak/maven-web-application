@@ -14,7 +14,8 @@ stage ("build")
 
 sh "${mavenHome}/bin/mvn clean package"
 }
-
+   
+/*   
 stage ("SonarQubereport")
 {
 
@@ -46,5 +47,5 @@ Regards,
 Islavath Parvathi,''', subject: 'Build Over', to: 'iparvathi229@gmail.com'
 
 }
-
+*/
 }
