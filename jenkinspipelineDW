@@ -1,0 +1,70 @@
+pipeline{
+
+agent any;
+
+tools{
+
+maven 'maven3.6.3'
+
+}
+
+stages{
+
+   stage('CheckoutCode'){
+   steps{
+   git branch: 'development', credentialsId: 'eed3d75e-3ba4-4b0b-a1ea-6884713fa08f', 
+url: 'https://github.com/parunayak/maven-web-application.git'
+ } 
+}
+
+   stage('Build'){
+   steps{   
+   sh "mvn clean package"
+ }
+}
+
+stage('ExcuteSonarQubeReport'){
+   steps{
+   sh "mvn sonar:sonar"
+ }
+}
+
+   stage("Artifactoryrepo"){
+   steps{
+   sh "mvn deploy"
+ }
+}
+
+stage("Deployappintotomcat"){
+   steps{
+   sshagent(['4e49752f-fc1b-41ff-b02f-7a1d8a29d3d6']){
+   sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@65.0.55.187:/opt/apache-tomcat-9.0.43/webapps/"
+ }
+}
+}
+
+  
+   stage("Emailnotification"){
+       steps{
+   post{
+   
+   success{
+mail body: '''Build Over!..Success
+
+Regards,
+Islavath Parvathi,''', subject: 'Build Over...Successfull', to: 'iparvathi229@gmail.com'
+}
+
+failure{
+
+mail body: '''Build Over!..Failed
+
+Regards,
+Islavath Parvathi,''', subject: 'Build Over...Failed', to: 'iparvathi229@gmail.com'
+}
+
+}
+}
+}
+}
+}
